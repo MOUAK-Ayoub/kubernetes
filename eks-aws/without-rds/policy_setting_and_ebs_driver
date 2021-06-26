@@ -1,0 +1,8 @@
+# Get the role of the worker nodes by
+
+kubectl -n kube-system describe configmap aws-auth
+
+# Then associate the policy in the json file to this role
+
+# Install ebs sci driver
+kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"

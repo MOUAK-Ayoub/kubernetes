@@ -1,0 +1,5 @@
+
+# Test from a node in the k8s cluster
+kubectl run postgresql-postgresql-client --rm --tty -i --restart='Never' --image bitnami/postgresql \
+ --env="PGPASSWORD=ayoubayoub"  -- psql -h postgres.clulqeqoztmt.us-east-1.rds.amazonaws.com  -U ayoub -d automatemail
+

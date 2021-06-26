@@ -1,0 +1,7 @@
+
+# Test from a node in the k8s cluster
+kubectl run postgresql-postgresql-client --rm --tty -i --restart='Never' --image bitnami/postgresql \
+ --env="PGPASSWORD=ayoub"  -- psql -h postgres-nodeport  -U ayoub -d automatemail
+
+# Insert values
+Insert into ayoub.campagne values (1, 176, 12, 'test','test@gmail.com') ;

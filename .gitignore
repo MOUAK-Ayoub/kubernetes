@@ -1,0 +1,6 @@
+/k8s-installation/terraform/.terraform/
+/k8s-installation/terraform/files/
+/k8s-installation/terraform/.terraform.lock.hcl
+/k8s-installation/terraform/terraform.tfstate
+/k8s-installation/terraform/terraform.tfstate.backup
+/.idea/

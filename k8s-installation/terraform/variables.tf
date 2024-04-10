@@ -1,5 +1,3 @@
-
-
 variable "region" {
   default = "us-east-1"
 }
@@ -80,7 +78,7 @@ variable "windows-sg-rules" {
     source_cidr_ip           = optional(list(string))
   }))
   default = {
-    "allow_rdp" = {
+    "allow_all_ingress" = {
       type           = "ingress"
       from_port      = 0
       to_port        = 0,
@@ -97,14 +95,14 @@ variable "windows-sg-rules" {
   }
 }
 
-variable "ansible_user" {
-  type = object({
-    user = string,
-    pwd  = string,
-  })
-  default = {
-    user = "ansible"
-    pwd  = "Test2024!"
+
+
+variable "token" {
+  type    = string
+  default = "123456.abcdefghigklmnop"
+  validation {
+    condition     = can(regex("[a-z0-9]{6}\\.[a-z0-9]{16}", var.token))
+    error_message = "For the token only values that match this regex [a-z0-9]{6}.[a-z0-9]{16} are allowed"
   }
 }
 

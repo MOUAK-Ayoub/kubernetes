@@ -1,11 +1,9 @@
 #!/bin/bash
 
-# Steps:
+# Three steps
 # 1/  Forwarding IPv4 and letting iptables see bridged traffic
 # 2/ Install containerd
 # 3/ Install kubelet kubeadm kubectl
-# 4/ Make interaction with cluster accessible to ec2-user without sudo
-# 5/ add calico plugin for networking
 echo '*********************************************** Script begin*****************************************'
 
 # modules in /etc/modules-load.d are loaded when kernel boot
@@ -49,13 +47,7 @@ EOF
 
 yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 systemctl enable --now kubelet
-kubeadm init --pod-network-cidr 190.0.0.0/16 --kubernetes-version 1.27.0
-sudo -u ec2-user -i <<'EOF'
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
-EOF
 
-kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+kubeadm join ${control_node_ip}:6443 --token ${token} --discovery-token-unsafe-skip-ca-verification
 
 echo '*********************************************** Script end*****************************************'

@@ -1,0 +1,202 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: test
+  POSTGRES_USER: postgres
+  # Important for ebs volume, if not the pod will crash
+  # The data directory is different than mount directory
+ PGDATA: /var/lib/postgresql/data/pgdata
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-db-password
+type: Opaque
+data:
+  db-password: dGVzdA==
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dbcreation-script-configmap
+data:
+  posrges_init.sql: |-
+    CREATE TABLE PEOPLE  (
+                                ID  SERIAL PRIMARY KEY ,
+                                FIRST_NAME VARCHAR(20),
+                                LAST_NAME VARCHAR(20)
+       ) ;
+
+      CREATE TABLE BATCH_JOB_INSTANCE  (
+      	JOB_INSTANCE_ID BIGINT  NOT NULL PRIMARY KEY ,
+      	VERSION BIGINT ,
+      	JOB_NAME VARCHAR(100) NOT NULL,
+      	JOB_KEY VARCHAR(32) NOT NULL,
+      	constraint JOB_INST_UN unique (JOB_NAME, JOB_KEY)
+      ) ;
+
+      CREATE TABLE BATCH_JOB_EXECUTION  (
+      	JOB_EXECUTION_ID BIGINT  NOT NULL PRIMARY KEY ,
+      	VERSION BIGINT  ,
+      	JOB_INSTANCE_ID BIGINT NOT NULL,
+      	CREATE_TIME TIMESTAMP NOT NULL,
+      	START_TIME TIMESTAMP DEFAULT NULL ,
+      	END_TIME TIMESTAMP DEFAULT NULL ,
+      	STATUS VARCHAR(10) ,
+      	EXIT_CODE VARCHAR(2500) ,
+      	EXIT_MESSAGE VARCHAR(2500) ,
+      	LAST_UPDATED TIMESTAMP,
+      	JOB_CONFIGURATION_LOCATION VARCHAR(2500) NULL,
+      	constraint JOB_INST_EXEC_FK foreign key (JOB_INSTANCE_ID)
+      	references BATCH_JOB_INSTANCE(JOB_INSTANCE_ID)
+      ) ;
+
+      CREATE TABLE BATCH_JOB_EXECUTION_PARAMS  (
+      	JOB_EXECUTION_ID BIGINT NOT NULL ,
+      	TYPE_CD VARCHAR(6) NOT NULL ,
+      	KEY_NAME VARCHAR(100) NOT NULL ,
+      	STRING_VAL VARCHAR(250) ,
+      	DATE_VAL TIMESTAMP DEFAULT NULL ,
+      	LONG_VAL BIGINT ,
+      	DOUBLE_VAL DOUBLE PRECISION ,
+      	IDENTIFYING CHAR(1) NOT NULL ,
+      	constraint JOB_EXEC_PARAMS_FK foreign key (JOB_EXECUTION_ID)
+      	references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
+      ) ;
+
+      CREATE TABLE BATCH_STEP_EXECUTION  (
+      	STEP_EXECUTION_ID BIGINT  NOT NULL PRIMARY KEY ,
+      	VERSION BIGINT NOT NULL,
+      	STEP_NAME VARCHAR(100) NOT NULL,
+      	JOB_EXECUTION_ID BIGINT NOT NULL,
+      	START_TIME TIMESTAMP NOT NULL ,
+      	END_TIME TIMESTAMP DEFAULT NULL ,
+      	STATUS VARCHAR(10) ,
+      	COMMIT_COUNT BIGINT ,
+      	READ_COUNT BIGINT ,
+      	FILTER_COUNT BIGINT ,
+      	WRITE_COUNT BIGINT ,
+      	READ_SKIP_COUNT BIGINT ,
+      	WRITE_SKIP_COUNT BIGINT ,
+      	PROCESS_SKIP_COUNT BIGINT ,
+      	ROLLBACK_COUNT BIGINT ,
+      	EXIT_CODE VARCHAR(2500) ,
+      	EXIT_MESSAGE VARCHAR(2500) ,
+      	LAST_UPDATED TIMESTAMP,
+      	constraint JOB_EXEC_STEP_FK foreign key (JOB_EXECUTION_ID)
+      	references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
+      ) ;
+
+      CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT  (
+      	STEP_EXECUTION_ID BIGINT NOT NULL PRIMARY KEY,
+      	SHORT_CONTEXT VARCHAR(2500) NOT NULL,
+      	SERIALIZED_CONTEXT TEXT ,
+      	constraint STEP_EXEC_CTX_FK foreign key (STEP_EXECUTION_ID)
+      	references BATCH_STEP_EXECUTION(STEP_EXECUTION_ID)
+      ) ;
+
+      CREATE TABLE BATCH_JOB_EXECUTION_CONTEXT  (
+      	JOB_EXECUTION_ID BIGINT NOT NULL PRIMARY KEY,
+      	SHORT_CONTEXT VARCHAR(2500) NOT NULL,
+      	SERIALIZED_CONTEXT TEXT ,
+      	constraint JOB_EXEC_CTX_FK foreign key (JOB_EXECUTION_ID)
+      	references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
+      ) ;
+
+      CREATE SEQUENCE BATCH_STEP_EXECUTION_SEQ MAXVALUE 9223372036854775807 NO CYCLE;
+      CREATE SEQUENCE BATCH_JOB_EXECUTION_SEQ MAXVALUE 9223372036854775807 NO CYCLE;
+      CREATE SEQUENCE BATCH_JOB_SEQ MAXVALUE 9223372036854775807 NO CYCLE;
+
+---
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ebs-sc
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-sc
+  resources:
+    requests:
+      storage: 4Gi
+
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:10.4
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-db-password
+                  key: db-password
+          envFrom:
+            - configMapRef:
+                name: postgres-config
+          volumeMounts:
+            - name: postgredb
+              mountPath: /var/lib/postgresql/data
+            - name: dbcreation-script
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
+        - name: dbcreation-script
+          configMap:
+            name: dbcreation-script-configmap
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+      nodePort: 31080
+
+
+

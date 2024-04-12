@@ -1,0 +1,37 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: automatemail
+  POSTGRES_USER: ayoub
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-db-password
+type: Opaque
+data:
+  db-password: YXlvdWI=
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dbcreation-script-configmap
+data:
+  posrges_init.sql: |-
+    CREATE SCHEMA  ayoub;
+    create table ayoub.campagne (
+    	id_campagne bigserial not null,
+    	id_planification int8 null,
+    	id_job_instance int8 null,
+    	denomination_expediteur varchar(255) null,
+    	adresse_email_expediteur varchar(317) null,
+    	constraint pk_campagne primary key (id_campagne)
+    );

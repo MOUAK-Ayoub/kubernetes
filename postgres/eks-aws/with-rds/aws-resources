@@ -1,3 +1,0 @@
-1/ Create subnets groups for RDS
-2/ Create RDS from aws interface
-3/ Configure the SG to accept connection on the port 5432

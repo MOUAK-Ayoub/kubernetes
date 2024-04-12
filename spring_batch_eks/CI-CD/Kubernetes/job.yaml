@@ -8,6 +8,6 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: bootiful-job
-          image: ayoubmouak/spring-batch-eks:1.0.0SNAPSHOT
+          image: ayoubmouak/spring-batch-eks:1.0.0-SNAPSHOT
           env:
               value: jdbc:postgresql://postgres/test

@@ -59,6 +59,11 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
 
+curl -LO https://get.helm.sh/helm-v3.14.4-linux-amd64.tar.gz
+tar xzvf helm-v3.14.4-linux-amd64.tar.gz
+sudo mv linux-amd64/helm /usr/local/bin/helm
+helm repo add stable https://charts.helm.sh/stable
+git clone https://github.com/MOUAK-Ayoub/kubernetes.git
 EOF
 
 kubeadm  token create ${token} --description "Default token to use to authenticate"

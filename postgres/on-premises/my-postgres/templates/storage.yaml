@@ -18,7 +18,7 @@ metadata:
   name: postgres-pv
 spec:
   storageClassName: localdisk
-  persistentVolumeReclaimPolicy: Recycle
+  persistentVolumeReclaimPolicy: Retain
   capacity:
     storage: 2Gi
   accessModes:

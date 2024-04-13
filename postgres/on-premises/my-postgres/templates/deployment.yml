@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:11.4
+          image: postgres:{{.Values.deployment.image.version}}
           ports:
             - containerPort: 5432
           env:

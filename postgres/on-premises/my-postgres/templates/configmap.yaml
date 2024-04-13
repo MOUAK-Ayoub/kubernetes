@@ -6,8 +6,8 @@ metadata:
   labels:
     app: postgres
 data:
-  POSTGRES_DB: automatemail
-  POSTGRES_USER: ayoub
+  POSTGRES_USER: {{.Values.config.POSTGRES_USER}}
+  POSTGRES_DB: {{.Values.config.POSTGRES_DB}}
 
 ---
 
@@ -17,7 +17,7 @@ metadata:
   name: postgres-db-password
 type: Opaque
 data:
-  db-password: YXlvdWI=
+  db-password: {{.Values.config.POSTGRES_PWD}}
 
 ---
 apiVersion: v1
@@ -25,13 +25,4 @@ kind: ConfigMap
 metadata:
   name: dbcreation-script-configmap
 data:
-  posrges_init.sql: |-
-    CREATE SCHEMA  ayoub;
-    create table ayoub.campagne (
-    	id_campagne bigserial not null,
-    	id_planification int8 null,
-    	id_job_instance int8 null,
-    	denomination_expediteur varchar(255) null,
-    	adresse_email_expediteur varchar(317) null,
-    	constraint pk_campagne primary key (id_campagne)
-    );
+  posrges_init.sql: {{.Values.config.posrges_init_sql}}

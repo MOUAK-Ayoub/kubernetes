@@ -1,0 +1,18 @@
+config:
+    POSTGRES_USER: ayoub
+    POSTGRES_PWD: YXlvdWI=
+    POSTGRES_DB: automatemail
+    posrges_init_sql: |-
+      CREATE SCHEMA  ayoub;
+      create table ayoub.campagne (
+        id_campagne bigserial not null,
+        id_planification int8 null,
+        id_job_instance int8 null,
+        denomination_expediteur varchar(255) null,
+        adresse_email_expediteur varchar(317) null,
+        constraint pk_campagne primary key (id_campagne)
+      );
+
+deployment:
+  image:
+    version: "11.4"

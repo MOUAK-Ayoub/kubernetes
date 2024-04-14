@@ -25,4 +25,4 @@ kind: ConfigMap
 metadata:
   name: dbcreation-script-configmap
 data:
-  posrges_init.sql: {{.Values.config.posrges_init_sql | toYaml | indent 1}}
+  postrges_init.sql: {{.Values.config.postrges_init_sql | toYaml | indent 1}}

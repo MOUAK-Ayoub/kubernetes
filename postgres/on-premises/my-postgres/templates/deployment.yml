@@ -34,8 +34,8 @@ spec:
             - configMapRef:
                 name: postgres-config
           volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: postgredb
+            - name: postgredb
+              mountPath: /var/lib/postgresql/data
             - name: dbcreation-script
               mountPath: /docker-entrypoint-initdb.d
       volumes:

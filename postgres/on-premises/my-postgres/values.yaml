@@ -2,7 +2,7 @@ config:
     POSTGRES_USER: ayoub
     POSTGRES_PWD: YXlvdWI=
     POSTGRES_DB: automatemail
-    posrges_init_sql: |-
+    postrges_init_sql: |-
       CREATE SCHEMA  ayoub;
       create table ayoub.campagne (
         id_campagne bigserial not null,

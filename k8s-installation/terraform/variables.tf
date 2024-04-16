@@ -106,6 +106,12 @@ variable "token" {
   }
 }
 
+variable "enable_addson" {
+  type    = bool
+  default = true
+
+}
+
 
 
 

@@ -17,7 +17,7 @@ locals {
     key => {
       os_ami         = val["os_ami"],
       type           = val["type"],
-      user_data      = templatefile(val["user_data_path"], {token=var.token}),
+      user_data      = templatefile(val["user_data_path"], {token=var.token, enable_addson=var.enable_addson}),
       tag_name       = val["tag_name"],
       instance_count = val["instance_count"]
     }

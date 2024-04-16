@@ -2,6 +2,5 @@
 kubectl run postgresql-postgresql-client --rm --tty -i --restart='Never' --image bitnami/postgresql \
  --env="PGPASSWORD={{.Values.config.POSTGRES_PWD | b64dec }}"  -- psql -h postgres-nodeport  -U {{.Values.config.POSTGRES_USER}} -d {{.Values.config.POSTGRES_DB}}
 
-2. Insert values for test purposes
-Insert into ayoub.campagne values (1, 176, 12, 'test','test@gmail.com') ;
+2.
 

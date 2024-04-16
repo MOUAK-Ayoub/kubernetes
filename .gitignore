@@ -3,4 +3,5 @@
 /k8s-installation/terraform/.terraform.lock.hcl
 /k8s-installation/terraform/terraform.tfstate
 /k8s-installation/terraform/terraform.tfstate.backup
+/k8s-installation/terraform/user_data/k8s_addson.sh
 /.idea/

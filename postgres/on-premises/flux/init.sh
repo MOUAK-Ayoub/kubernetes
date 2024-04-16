@@ -26,7 +26,7 @@ kubectl get alerts.notification.toolkit.fluxcd.io
 flux create secret git k8s-auth-github \
    --url=https://github.com/MOUAK-Ayoub/kubernetes.git \
    --username=ayoub.mouak.2015@gmail.com \
-   --password='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' \
+   --password='xxx' \
    --namespace=default
 
 mkdir {sources,kustomizations}
@@ -35,7 +35,7 @@ flux create source git  no-helm-temp-source \
    --branch=master \
    --namespace=default \
    --username=ayoub.mouak.2015@gmail.com \
-   --password='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' \
+   --password='xxx' \
    --export > sources/no-helm-temp-deployment.yaml
 
 flux create kustomization   no-helm-temp-kustom \

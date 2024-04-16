@@ -9,7 +9,7 @@ metadata:
     fluxcd.io/ignore: "true"
     fluxcd.io/automated: "false"
 spec:
-  replicas: 8
+  replicas: 2
   selector:
     matchLabels:
       app: nginxhello

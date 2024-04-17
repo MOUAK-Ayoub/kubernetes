@@ -1,4 +1,4 @@
-export GITHUB_TOKEN='xxxxx'
+export GITHUB_TOKEN='xxxx'
 
 tee secret.yaml << EOF
 apiVersion: v1
@@ -18,7 +18,7 @@ flux bootstrap github --token-auth \
 --components-extra=image-reflector-controller,image-automation-controller
 kubectl get all --namespace flux-system
 
-sudo yum install -y git
+sudo yum install -y git tree
 
 git clone  "https://$GITHUB_TOKEN@github.com/MOUAK-Ayoub/gitops-flux.git"
 cd gitops-flux
@@ -45,14 +45,14 @@ cd ..
 
 mkdir {sources,kustomizations}
 flux create source git  no-helm-temp-source \
-   --url=https://github.com/MOUAK-Ayoub/kubernetes.git \
+   --url=https://$GITHUB_TOKEN@github.com/MOUAK-Ayoub/kubernetes.git \
    --branch=master \
    --namespace=default \
    --username=ayoub.mouak.2015@gmail.com \
    --password=$GITHUB_TOKEN \
    --export > sources/no-helm-temp-deployment.yaml
 
-flux create kustomization   no-helm-temp-kustom \
+flux create kustomization  no-helm-temp-kustom \
    --source=no-helm-temp-source.default \
    --path=./postgres/on-premises/no-helm-tmp \
    --prune=true \
